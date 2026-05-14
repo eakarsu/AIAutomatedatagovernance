@@ -3,21 +3,46 @@ const router = express.Router();
 const { pool } = require('../db');
 const authMiddleware = require('../middleware/auth');
 
-// GET / - list all, support ?search
+// GET / - list all, support ?search; paginated when ?page/?limit/?paginated=true is supplied (raw array otherwise for back-compat).
 router.get('/', async (req, res) => {
   try {
     const { search } = req.query;
-    let query = 'SELECT * FROM data_catalog';
-    const params = [];
+    const wantsPagination = req.query.page !== undefined || req.query.paginated === 'true' || req.query.limit !== undefined;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 25));
+    const offset = (page - 1) * limit;
 
+    const params = [];
+    let where = '';
     if (search) {
-      query += ' WHERE table_name ILIKE $1 OR description ILIKE $1 OR source_system ILIKE $1 OR owner ILIKE $1';
+      params.push(search);
       params.push(`%${search}%`);
+      where = `WHERE to_tsvector('english', table_name || ' ' || COALESCE(description, '')) @@ plainto_tsquery('english', $1)
+               OR source_system ILIKE $2 OR owner ILIKE $2`;
     }
 
-    query += ' ORDER BY created_at DESC';
-    const result = await pool.query(query, params);
-    res.json(result.rows);
+    if (!wantsPagination) {
+      const all = await pool.query(`SELECT * FROM data_catalog ${where} ORDER BY created_at DESC`, params);
+      return res.json(all.rows);
+    }
+
+    const cParams = [...params];
+    params.push(limit); const lp = `$${params.length}`;
+    params.push(offset); const op = `$${params.length}`;
+    const result = await pool.query(
+      `SELECT * FROM data_catalog ${where} ORDER BY created_at DESC LIMIT ${lp} OFFSET ${op}`,
+      params
+    );
+    const countResult = await pool.query(`SELECT COUNT(*)::int AS total FROM data_catalog ${where}`, cParams);
+
+    res.json({
+      data: result.rows,
+      pagination: {
+        page, limit,
+        total: countResult.rows[0].total,
+        totalPages: Math.ceil(countResult.rows[0].total / limit)
+      }
+    });
   } catch (err) {
     console.error('Data catalog list error:', err);
     res.status(500).json({ error: 'Internal server error' });

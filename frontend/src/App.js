@@ -40,6 +40,7 @@ const AccessControlPage = React.lazy(() => import('./components/AccessControl'))
 const GlossaryPage = React.lazy(() => import('./components/DataGlossary'));
 const AuditPage = React.lazy(() => import('./components/AuditLogs'));
 const AIAssistantPage = React.lazy(() => import('./components/AIInsights'));
+const AIAdvancedPage = React.lazy(() => import('./components/AIAdvancedFeatures'));
 
 // ─── Auth Context ───────────────────────────────────────────────
 const AuthContext = createContext(null);
@@ -277,6 +278,7 @@ const NAV_ITEMS = [
   { key: 'glossary', label: 'Glossary', icon: BookOpen },
   { key: 'audit', label: 'Audit Log', icon: ClipboardList },
   { key: 'ai', label: 'AI Assistant', icon: Bot },
+  { key: 'ai-adv', label: 'Advanced AI', icon: Bot },
 ];
 
 function Sidebar({ activeSection, onNavigate, collapsed, onToggle }) {
@@ -379,6 +381,8 @@ function DashboardLayout() {
         return <React.Suspense fallback={fallback}><AuditPage /></React.Suspense>;
       case 'ai':
         return <React.Suspense fallback={fallback}><AIAssistantPage /></React.Suspense>;
+      case 'ai-adv':
+        return <React.Suspense fallback={fallback}><AIAdvancedPage /></React.Suspense>;
       default:
         return <React.Suspense fallback={fallback}><DashboardHome /></React.Suspense>;
     }

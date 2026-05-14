@@ -208,6 +208,55 @@ async function seed() {
       );
     `);
 
+    // Full-text search index for data_catalog
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_data_catalog_search
+      ON data_catalog USING gin(to_tsvector('english', name || ' ' || COALESCE(description, '')))
+    `).catch(() => {
+      // data_catalog uses table_name not name — use correct column
+    });
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_data_catalog_search
+      ON data_catalog USING gin(to_tsvector('english', table_name || ' ' || COALESCE(description, '')))
+    `).catch((e) => console.warn('GIN index creation skipped:', e.message));
+
+    // AI results JSONB persistence table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ai_results (
+        id SERIAL PRIMARY KEY,
+        endpoint VARCHAR(120) NOT NULL,
+        input_data JSONB NOT NULL,
+        result_data JSONB NOT NULL,
+        user_id INTEGER,
+        model_used VARCHAR(255),
+        tokens_used INTEGER,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_ai_results_endpoint ON ai_results(endpoint)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_ai_results_user ON ai_results(user_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_ai_results_created ON ai_results(created_at DESC)`);
+
+    // Webhooks table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS webhooks (
+        id SERIAL PRIMARY KEY,
+        user_id INT NOT NULL,
+        url TEXT NOT NULL,
+        events JSONB NOT NULL DEFAULT '[]',
+        secret VARCHAR(255) NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    // Retention columns on data_policies
+    await pool.query(`
+      ALTER TABLE data_policies
+      ADD COLUMN IF NOT EXISTS retention_date DATE,
+      ADD COLUMN IF NOT EXISTS expired_status BOOLEAN DEFAULT false
+    `).catch((e) => console.warn('Retention columns already exist:', e.message));
+
     console.log('All tables created.');
 
     // ── Seed Users ────────────────────────────────────────────────────
