@@ -45,6 +45,7 @@ app.use('/api/webhooks', require('./routes/webhooks').router);
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/policies', require('./routes/policies'));
 app.use('/api/ext', require('./routes/extensions')); // Apply pass 5 backlog: DW integrations, profiling, scorecards, marketplace, PII stream
+app.use('/api/custom-views', require('./routes/customViews')); // Governance Views: lineage graph, classification heatmap, audit PDF, policy rules
 
 // Health check
 app.get('/api/health', (req, res) => {
