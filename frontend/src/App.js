@@ -24,6 +24,7 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
+  Layers,
 } from 'lucide-react';
 
 // Lazy load heavy page components
@@ -40,6 +41,8 @@ const AccessControlPage = React.lazy(() => import('./components/AccessControl'))
 const GlossaryPage = React.lazy(() => import('./components/DataGlossary'));
 const AuditPage = React.lazy(() => import('./components/AuditLogs'));
 const AIAssistantPage = React.lazy(() => import('./components/AIInsights'));
+const AIAdvancedPage = React.lazy(() => import('./components/AIAdvancedFeatures'));
+const CustomViewsPage = React.lazy(() => import('./components/CustomViewsPage'));
 
 // ─── Auth Context ───────────────────────────────────────────────
 const AuthContext = createContext(null);
@@ -277,6 +280,8 @@ const NAV_ITEMS = [
   { key: 'glossary', label: 'Glossary', icon: BookOpen },
   { key: 'audit', label: 'Audit Log', icon: ClipboardList },
   { key: 'ai', label: 'AI Assistant', icon: Bot },
+  { key: 'ai-adv', label: 'Advanced AI', icon: Bot },
+  { key: 'custom-views', label: 'Governance Views', icon: Layers },
 ];
 
 function Sidebar({ activeSection, onNavigate, collapsed, onToggle }) {
@@ -339,8 +344,8 @@ function Sidebar({ activeSection, onNavigate, collapsed, onToggle }) {
 }
 
 // ─── Dashboard Layout ───────────────────────────────────────────
-function DashboardLayout() {
-  const [activeSection, setActiveSection] = useState('home');
+function DashboardLayout({ initialSection = 'home' }) {
+  const [activeSection, setActiveSection] = useState(initialSection);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleNavigate = useCallback((section) => {
@@ -379,6 +384,10 @@ function DashboardLayout() {
         return <React.Suspense fallback={fallback}><AuditPage /></React.Suspense>;
       case 'ai':
         return <React.Suspense fallback={fallback}><AIAssistantPage /></React.Suspense>;
+      case 'ai-adv':
+        return <React.Suspense fallback={fallback}><AIAdvancedPage /></React.Suspense>;
+      case 'custom-views':
+        return <React.Suspense fallback={fallback}><CustomViewsPage /></React.Suspense>;
       default:
         return <React.Suspense fallback={fallback}><DashboardHome /></React.Suspense>;
     }
@@ -410,6 +419,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/custom-views"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout initialSection="custom-views" />
             </ProtectedRoute>
           }
         />

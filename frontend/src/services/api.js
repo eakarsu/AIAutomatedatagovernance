@@ -88,7 +88,7 @@ export const auditAPI = {
   getById: (id) => api.get(`/audit-logs/${id}`),
 };
 
-// AI API
+// AI API — base + new audit-driven features
 export const aiAPI = {
   classify: (data) => api.post('/ai/classify', data),
   detectAnomalies: (data) => api.post('/ai/anomaly-detection', data),
@@ -96,6 +96,18 @@ export const aiAPI = {
   impactAnalysis: (data) => api.post('/ai/impact-analysis', data),
   suggestQualityRules: (data) => api.post('/ai/suggest-quality-rules', data),
   generateDescription: (data) => api.post('/ai/generate-description', data),
+  // ── New audit-driven features ────────────────────────────────────────
+  history: (params) => api.get('/ai/history', { params }),
+  discoverSensitive: (data) => api.post('/ai/discover-sensitive', data),
+  generatePIA: (data) => api.post('/ai/generate-pia', data),
+  retentionRecommendation: (data) => api.post('/ai/retention-recommendation', data),
+  lineageGraph: (tableName, depth = 2) => api.get(`/ai/lineage-graph/${encodeURIComponent(tableName)}`, { params: { depth } }),
+  detectAccessAnomalies: (data) => api.post('/ai/detect-access-anomalies', data),
+  suggestGlossary: (data) => api.post('/ai/suggest-glossary', data),
+  generateComplianceReport: (data) => api.post('/ai/generate-compliance-report', data),
+  balanceStewards: (data) => api.post('/ai/balance-stewards', data),
+  schemaEvolution: (data) => api.post('/ai/schema-evolution', data),
+  masterDataMatch: (data) => api.post('/ai/master-data-match', data),
 };
 
 export default api;
