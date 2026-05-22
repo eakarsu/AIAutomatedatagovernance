@@ -3,6 +3,9 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { authAPI } from './services/api';
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
 import {
   LayoutDashboard,
   Database,
@@ -25,6 +28,7 @@ import {
   Eye,
   EyeOff,
   Layers,
+  FileCheck,
 } from 'lucide-react';
 
 // Lazy load heavy page components
@@ -43,6 +47,7 @@ const AuditPage = React.lazy(() => import('./components/AuditLogs'));
 const AIAssistantPage = React.lazy(() => import('./components/AIInsights'));
 const AIAdvancedPage = React.lazy(() => import('./components/AIAdvancedFeatures'));
 const CustomViewsPage = React.lazy(() => import('./components/CustomViewsPage'));
+const DataContractMonitor = React.lazy(() => import('./components/DataContractMonitor'));
 
 // ─── Auth Context ───────────────────────────────────────────────
 const AuthContext = createContext(null);
@@ -282,6 +287,7 @@ const NAV_ITEMS = [
   { key: 'ai', label: 'AI Assistant', icon: Bot },
   { key: 'ai-adv', label: 'Advanced AI', icon: Bot },
   { key: 'custom-views', label: 'Governance Views', icon: Layers },
+  { key: 'data-contracts', label: 'Data Contracts', icon: FileCheck },
 ];
 
 function Sidebar({ activeSection, onNavigate, collapsed, onToggle }) {
@@ -388,6 +394,8 @@ function DashboardLayout({ initialSection = 'home' }) {
         return <React.Suspense fallback={fallback}><AIAdvancedPage /></React.Suspense>;
       case 'custom-views':
         return <React.Suspense fallback={fallback}><CustomViewsPage /></React.Suspense>;
+      case 'data-contracts':
+        return <React.Suspense fallback={fallback}><DataContractMonitor /></React.Suspense>;
       default:
         return <React.Suspense fallback={fallback}><DashboardHome /></React.Suspense>;
     }
@@ -413,6 +421,9 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
+        <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
+        <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
+
         <Route path="/" element={<LoginPage />} />
         <Route
           path="/dashboard"
@@ -427,6 +438,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardLayout initialSection="custom-views" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/data-contract-monitor"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout initialSection="data-contracts" />
             </ProtectedRoute>
           }
         />
