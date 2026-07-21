@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { pool } = require('../db');
 const authMiddleware = require('../middleware/auth');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'airline-data-governance-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // POST /login
 router.post('/login', async (req, res) => {
@@ -54,11 +54,12 @@ router.post('/login', async (req, res) => {
 // POST /register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, full_name, role, department } = req.body;
+    const { email, password, full_name, department } = req.body;
 
-    if (!email || !password || !full_name || !role) {
-      return res.status(400).json({ error: 'Email, password, full_name, and role are required' });
+    if (!email || !password || !full_name) {
+      return res.status(400).json({ error: 'Email, password, and full_name are required' });
     }
+    if (password.length < 12) return res.status(400).json({ error: 'Password must be at least 12 characters' });
 
     const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
@@ -70,7 +71,7 @@ router.post('/register', async (req, res) => {
     const result = await pool.query(
       `INSERT INTO users (email, password_hash, full_name, role, department)
        VALUES ($1, $2, $3, $4, $5) RETURNING id, email, full_name, role, department, created_at`,
-      [email, password_hash, full_name, role, department || null]
+      [email, password_hash, full_name, 'viewer', department || null]
     );
 
     const user = result.rows[0];
