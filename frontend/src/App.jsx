@@ -249,7 +249,7 @@ function LoginPage() {
               type="button"
               className="btn btn-secondary btn-block"
               style={{ marginBottom: '12px' }}
-              onClick={() => setForm({ ...form, email: 'admin@skylineairways.com', password: 'Admin@2024!' })}
+              onClick={() => setForm({ ...form, email: import.meta.env.VITE_DEMO_EMAIL || '', password: import.meta.env.VITE_DEMO_PASSWORD || '' })}
             >
               Demo Login (Auto-Fill Credentials)
             </button>
