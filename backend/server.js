@@ -27,6 +27,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
+app.use('/api', require('./runtimeAcceptance'));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
