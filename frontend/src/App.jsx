@@ -251,7 +251,7 @@ function LoginPage() {
               style={{ marginBottom: '12px' }}
               onClick={() => setForm({ ...form, email: import.meta.env.VITE_DEMO_EMAIL || '', password: import.meta.env.VITE_DEMO_PASSWORD || '' })}
             >
-              Demo Login (Auto-Fill Credentials)
+              Auto Fill Demo Credentials
             </button>
           )}
           <button
