@@ -1,3 +1,4 @@
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Edit2, Trash2, CheckCircle, AlertTriangle, XCircle, Activity, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -143,27 +144,8 @@ const DataQuality = () => {
       </div>
 
       {/* AI Suggestions */}
-      {aiSuggestions && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Sparkles size={18} /> AI Suggested Rules</h3>
-            <button className="btn btn-sm btn-secondary" onClick={() => setAiSuggestions(null)}><X size={14} /> Dismiss</button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-            {(aiSuggestions.suggestions || aiSuggestions || []).map((sug, i) => (
-              <div key={i} style={{ padding: '1.25rem', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.06))', border: '1px solid rgba(99,102,241,0.2)' }}>
-                <h4 style={{ margin: '0 0 0.5rem' }}>{sug.rule_name || sug.name || `Suggested Rule ${i + 1}`}</h4>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', marginBottom: '0.5rem' }}>
-                  <strong>Type:</strong> {sug.rule_type || 'N/A'} | <strong>Table:</strong> {sug.table_name || 'N/A'}
-                </div>
-                {sug.description && <p style={{ fontSize: '0.85rem', margin: '0.5rem 0', color: 'var(--text-secondary)' }}>{sug.description}</p>}
-                {sug.rule_expression && <code style={{ fontSize: '0.8rem', background: 'var(--bg-tertiary)', padding: '0.25rem 0.5rem', borderRadius: '4px', display: 'block', marginTop: '0.5rem' }}>{sug.rule_expression}</code>}
-                {sug.threshold && <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}><strong>Threshold:</strong> {sug.threshold}%</div>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {aiSuggestions && <section><button type="button" className="btn btn-sm btn-secondary" onClick={() => setAiSuggestions(null)}>Dismiss</button><FormattedAIReport title="Suggested quality rules" response={aiSuggestions} /></section>}
+
 
       <div className="search-bar">
         <Search size={16} />

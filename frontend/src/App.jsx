@@ -82,6 +82,23 @@ function AuthProvider({ children }) {
     }
   };
 
+  const demoLogin = async () => {
+    setLoading(true);
+    try {
+      const { data } = await authAPI.demoLogin();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setToken(data.token);
+      setUser(data.user);
+      return true;
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Demo login is unavailable.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const register = async (userData) => {
     setLoading(true);
     try {
@@ -111,7 +128,7 @@ function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, demoLogin, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -126,11 +143,16 @@ function ProtectedRoute({ children }) {
 
 // ─── Login Page ─────────────────────────────────────────────────
 function LoginPage() {
-  const { login, register, loading, token } = useAuth();
+  const { login, demoLogin, register, loading, token } = useAuth();
   const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'viewer' });
+  const [demoAvailable, setDemoAvailable] = useState(false);
+
+  useEffect(() => {
+    authAPI.demoAvailability().then(({ data }) => setDemoAvailable(Boolean(data.available))).catch(() => setDemoAvailable(false));
+  }, []);
 
   useEffect(() => {
     if (token) navigate('/dashboard', { replace: true });
@@ -245,15 +267,35 @@ function LoginPage() {
 
         <div className="login-footer">
           {!isRegister && (
-            <button
-              type="button"
-              className="btn btn-secondary btn-block"
-              style={{ marginBottom: '12px' }}
-              onClick={() => setForm({ ...form, email: import.meta.env.VITE_DEMO_EMAIL || '', password: import.meta.env.VITE_DEMO_PASSWORD || '' })}
-            >
-              Auto Fill Demo Credentials
-            </button>
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary btn-block"
+                style={{ marginBottom: '12px' }}
+                disabled={loading || !demoAvailable}
+                onClick={async () => { if (await demoLogin()) navigate('/dashboard', { replace: true }); }}
+              >
+                Log In as Demo
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-block"
+                style={{ marginBottom: '12px' }}
+                disabled={loading}
+                onClick={async () => {
+                  try {
+                    const { data } = await authAPI.demoCredentials();
+                    setForm((current) => ({ ...current, email: data.email || '', password: data.password || '' }));
+                  } catch {
+                    toast.error('Demo credentials are not configured for this local environment.');
+                  }
+                }}
+              >
+                Fill Demo Credentials
+              </button>
+            </>
           )}
+          {!isRegister && !demoAvailable && <p role="status">Demo login requires a configured local account and explicit development opt-in.</p>}
           <button
             type="button"
             className="btn-link"

@@ -1,3 +1,5 @@
+import FormattedAIReport from "./FormattedAIReport";
+import AIHistory from './AIHistory';
 import React, { useState } from 'react';
 import { Search, Shield, Clock, GitBranch, AlertTriangle, BookOpen, FileBarChart, Users, Loader, Database, Layers } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -24,10 +26,10 @@ const AIAdvancedFeatures = () => {
   const [piaForm, setPiaForm] = useState({ initiative_name: '', description: '', data_categories: '', processing_purpose: '', jurisdictions: 'US,EU' });
   const [retentionForm, setRetentionForm] = useState({ data_category: 'PII', frameworks: 'GDPR,SOX', legal_hold: false });
   const [lineageForm, setLineageForm] = useState({ table_name: '', depth: 2 });
-  const [accessForm, setAccessForm] = useState({ json: '[\n  { "user_id": "u1", "timestamp": "2026-04-15T03:00:00Z", "resource": "passenger_manifests" }\n]' });
+  const [accessForm, setAccessForm] = useState({ json: '[]' });
   const [glossaryForm, setGlossaryForm] = useState({ json: '[\n  { "table_name": "ops.flights", "column_name": "dep_dt_utc", "data_type": "timestamptz" }\n]' });
   const [reportForm, setReportForm] = useState({ framework: 'SOC2', period_start: '', period_end: '', scope: '' });
-  const [stewardForm, setStewardForm] = useState({ json: '[\n  { "id": 1, "name": "passenger_manifests", "domain": "Operations" }\n]' });
+  const [stewardForm, setStewardForm] = useState({ json: '[]' });
   const [schemaForm, setSchemaForm] = useState({
     table_name: 'passengers',
     current_schema_json: '{\n  "id": "int",\n  "email": "varchar(255)",\n  "first_name": "varchar(100)"\n}',
@@ -37,9 +39,42 @@ const AIAdvancedFeatures = () => {
   });
   const [mdmForm, setMdmForm] = useState({
     entity_type: 'customer',
-    records_json: '[\n  { "id": "c1", "name": "Jane Doe", "email": "jane@example.com" },\n  { "id": "c2", "name": "Jane M Doe", "email": "jane.doe@example.com" }\n]',
+    records_json: '[]',
     match_threshold: 0.85
   });
+  const [presetNotice, setPresetNotice] = useState('');
+  const scenarios = [
+    { name: 'Passenger operations', table: 'passenger_manifest', category: 'PII', framework: 'GDPR', scope: 'Passenger operations', purpose: 'Coordinate boarding and customer support', date: '2026-10-01' },
+    { name: 'Flight operations', table: 'flight_schedule', category: 'Financial', framework: 'SOC2', scope: 'Flight operations', purpose: 'Monitor schedule changes and downstream use', date: '2026-09-01' },
+    { name: 'Loyalty program', table: 'loyalty_members', category: 'PII', framework: 'SOX', scope: 'Loyalty program', purpose: 'Review member data processing and retention', date: '2026-08-01' },
+  ];
+  const fillScenario = (index) => {
+    const s = scenarios[index];
+    const columns = JSON.stringify([{ table: s.table, column: 'email', sample: 'sample@example.com' }, { table: s.table, column: 'status', sample: 'active' }], null, 2);
+    const glossary = JSON.stringify([{ table_name: s.table, column_name: 'status', data_type: 'varchar' }], null, 2);
+    const keepReferences = (json, update) => {
+      try {
+        const records = JSON.parse(json);
+        return Array.isArray(records) ? JSON.stringify(records.map(update), null, 2) : json;
+      } catch (_) { return json; }
+    };
+    const setters = {
+      discover: () => setDiscoverForm({ json: columns }),
+      pia: () => setPiaForm({ initiative_name: s.name, description: `Assess ${s.scope.toLowerCase()} data processing, access, retention and data subject impact.`, data_categories: s.category + ', operational data', processing_purpose: s.purpose, jurisdictions: index === 1 ? 'US' : 'US,EU' }),
+      retention: () => setRetentionForm({ data_category: s.category, frameworks: s.framework, legal_hold: index === 1 }),
+      lineage: () => setLineageForm({ table_name: s.table, depth: index + 2 }),
+      access: () => setAccessForm(current => ({ json: keepReferences(current.json, record => ({ ...record, timestamp: `${s.date}T09:30:00Z`, resource: s.table })) })),
+      glossary: () => setGlossaryForm({ json: glossary }),
+      report: () => setReportForm({ framework: s.framework, period_start: s.date, period_end: '2026-10-10', scope: s.scope }),
+      steward: () => setStewardForm(current => ({ json: keepReferences(current.json, record => ({ ...record, name: s.table, domain: s.scope })) })),
+      schema: () => setSchemaForm({ table_name: s.table, current_schema_json: JSON.stringify({ email: 'varchar(255)', status: 'varchar(32)' }, null, 2), proposed_changes_json: JSON.stringify([{ type: 'add_column', name: 'review_status', data_type: 'varchar(32)' }], null, 2), downstream_consumers_json: JSON.stringify([`${s.table}_report`], null, 2), business_context: s.purpose }),
+      mdm: () => setMdmForm(current => ({ ...current, entity_type: s.name.toLowerCase(), match_threshold: [0.8, 0.85, 0.9][index], records_json: keepReferences(current.records_json, (record, position) => ({ ...record, name: `${s.name} record ${position + 1}`, email: `sample${position + 1}@example.com` })) })),
+    };
+    setters[activeTab]?.();
+    setPresetNotice(['access', 'steward', 'mdm'].includes(activeTab)
+      ? 'Scenario fields filled. Add genuine source records and identifiers before running this feature; the preset cannot supply them.'
+      : 'Scenario fields filled. Review the example before running this feature.');
+  };
 
   const tabs = [
     { key: 'discover',  label: 'Sensitive Data Scanner', icon: <Search size={16} /> },
@@ -73,7 +108,7 @@ const AIAdvancedFeatures = () => {
     try {
       const res = await fn();
       setResult(res.data);
-      toast.success('AI request complete');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'AI request complete');
     } catch (err) {
       toast.error(err.response?.data?.error || err.message || 'AI request failed');
     } finally {
@@ -185,6 +220,13 @@ const AIAdvancedFeatures = () => {
 
   return (
     <div style={{ padding: 24 }}>
+      <section aria-label="AI example presets" style={{ marginBottom: 16 }}>
+        <strong>Fill a complete scenario</strong>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+          {scenarios.map((scenario, index) => <button key={scenario.name} type="button" disabled={loading} onClick={() => fillScenario(index)}>{scenario.name}</button>)}
+        </div>
+        {presetNotice && <p role="status">{presetNotice}</p>}
+      </section>
       <header style={{ marginBottom: 16 }}>
         <h2 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Shield size={20} /> Advanced AI Governance Features
@@ -271,7 +313,7 @@ const AIAdvancedFeatures = () => {
           {activeTab === 'access' && (
             <>
               <h3>Access Anomaly Detector</h3>
-              <p>Provide JSON array of access logs <code>{`{user_id, timestamp, resource}`}</code>.</p>
+              <p>Provide actual access logs with real user references as a JSON array <code>{`{user_id, timestamp, resource}`}</code>. Presets cannot supply these records.</p>
               <textarea rows={10} style={{ width: '100%' }} value={accessForm.json}
                 onChange={e => setAccessForm({ json: e.target.value })} />
               <button onClick={handleAccess} disabled={loading} style={btn}>Detect Anomalies</button>
@@ -312,7 +354,7 @@ const AIAdvancedFeatures = () => {
           {activeTab === 'steward' && (
             <>
               <h3>Steward Workload Balancer</h3>
-              <p>Provide JSON array of unassigned assets <code>{`{id, name, domain}`}</code>.</p>
+              <p>Provide actual unassigned assets with real record IDs as a JSON array <code>{`{id, name, domain}`}</code>. Presets cannot supply these records.</p>
               <textarea rows={10} style={{ width: '100%' }} value={stewardForm.json}
                 onChange={e => setStewardForm({ json: e.target.value })} />
               <button onClick={handleSteward} disabled={loading} style={btn}>Balance</button>
@@ -347,7 +389,7 @@ const AIAdvancedFeatures = () => {
               <input type="number" min="0" max="1" step="0.05" placeholder="Match threshold (0-1)"
                 value={mdmForm.match_threshold}
                 onChange={e => setMdmForm({ ...mdmForm, match_threshold: e.target.value })} style={inp} />
-              <label style={{ fontSize: 12, color: '#666' }}>Records (JSON array, at least 2)</label>
+              <label style={{ fontSize: 12, color: '#666' }}>Actual source records with real IDs (JSON array, at least 2; presets cannot supply these records)</label>
               <textarea rows={10} style={{ width: '100%' }} value={mdmForm.records_json}
                 onChange={e => setMdmForm({ ...mdmForm, records_json: e.target.value })} />
               <button onClick={handleMDM} disabled={loading} style={btn}>Detect Duplicates</button>
@@ -361,12 +403,11 @@ const AIAdvancedFeatures = () => {
           <h3>Result</h3>
           {!result && <p style={{ color: '#888' }}>Run a feature to see the response.</p>}
           {result && (
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 600, overflow: 'auto' }}>
-              {JSON.stringify(result, null, 2)}
-            </pre>
+            <FormattedAIReport response={result} />
           )}
         </div>
       </div>
+      <AIHistory />
     </div>
   );
 };

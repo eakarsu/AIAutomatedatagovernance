@@ -1,3 +1,4 @@
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Edit2, Trash2, Database, Users, Tag, FileText, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -215,36 +216,8 @@ const MetadataManagement = () => {
                 </button>
               </div>
 
-              {aiResult && (
-                <div style={{ marginTop: '1rem', padding: '1.25rem', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08))', border: '2px solid transparent', boxShadow: '0 0 0 2px rgba(99,102,241,0.3)' }}>
-                  <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Sparkles size={18} /> AI Generated Content</h3>
+              {aiResult && <FormattedAIReport title="Generated metadata" response={aiResult} />}
 
-                  <div style={{ display: 'grid', gap: '0.75rem' }}>
-                    {aiResult.description && (
-                      <div style={{ padding: '1rem', background: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-primary)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.5rem' }}><FileText size={14} /> Description</div>
-                        <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{aiResult.description}</p>
-                      </div>
-                    )}
-
-                    {aiResult.business_definition && (
-                      <div style={{ padding: '1rem', background: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-primary)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.5rem' }}><Database size={14} /> Business Definition</div>
-                        <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{aiResult.business_definition}</p>
-                      </div>
-                    )}
-
-                    {aiResult.suggested_tags && aiResult.suggested_tags.length > 0 && (
-                      <div style={{ padding: '1rem', background: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-primary)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.5rem' }}><Tag size={14} /> Suggested Tags</div>
-                        <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                          {aiResult.suggested_tags.map((tag, i) => <TagPill key={i} tag={tag} />)}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

@@ -275,8 +275,9 @@ async function seed() {
         ('j.chen@skylineairways.com', $1, 'James Chen', 'data_steward', 'Flight Operations'),
         ('m.rodriguez@skylineairways.com', $1, 'Maria Rodriguez', 'analyst', 'Revenue Management'),
         ('d.patel@skylineairways.com', $1, 'Deepak Patel', 'engineer', 'IT Infrastructure'),
-        ('l.johnson@skylineairways.com', $1, 'Lisa Johnson', 'viewer', 'Compliance')
-    `, [adminHash]);
+        ('l.johnson@skylineairways.com', $1, 'Lisa Johnson', 'viewer', 'Compliance'),
+        ($2, $1, 'Runtime Admin', 'admin', 'Data Governance')
+    `, [adminHash, process.env.DEMO_EMAIL || 'runtime-admin@example.com']);
     console.log('Users seeded.');
 
     // ── Seed Data Catalog ─────────────────────────────────────────────

@@ -27,7 +27,10 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
-app.use('/api', require('./runtimeAcceptance'));
+// Native AI screens use this router and its ai_results history. Mount it first
+// so the separate runtime acceptance history route does not shadow that history.
+app.use('/api/ai', require('./routes/ai'));
+if (process.env.RUNTIME_AI_ENDPOINT) app.use('/api', require('./runtimeAcceptance'));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));

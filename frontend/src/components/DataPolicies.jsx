@@ -1,3 +1,4 @@
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Edit2, Trash2, FileCheck, ShieldCheck, AlertTriangle, Clock, Sparkles, CheckSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -138,50 +139,8 @@ const DataPolicies = () => {
       </div>
 
       {/* AI Generated Policy */}
-      {aiResult && (
-        <div style={{ marginBottom: '1.5rem', padding: '1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08))', border: '2px solid transparent', boxShadow: '0 0 0 2px rgba(99,102,241,0.3)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Sparkles size={18} /> AI Generated Policy</h3>
-            <button className="btn btn-sm btn-secondary" onClick={() => setAiResult(null)}><X size={14} /> Dismiss</button>
-          </div>
+      {aiResult && <section><button type="button" className="btn btn-sm btn-secondary" onClick={() => setAiResult(null)}>Dismiss</button><FormattedAIReport title="Generated policy" response={aiResult} /></section>}
 
-          {aiResult.policy_name && (
-            <h4 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem' }}>{aiResult.policy_name}</h4>
-          )}
-
-          {aiResult.description && (
-            <p style={{ margin: '0 0 1rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>{aiResult.description}</p>
-          )}
-
-          {aiResult.key_provisions && aiResult.key_provisions.length > 0 && (
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Key Provisions</div>
-              <ol style={{ margin: 0, paddingLeft: '1.5rem' }}>
-                {aiResult.key_provisions.map((p, i) => <li key={i} style={{ marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>{p}</li>)}
-              </ol>
-            </div>
-          )}
-
-          {aiResult.implementation_steps && aiResult.implementation_steps.length > 0 && (
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Implementation Steps</div>
-              {aiResult.implementation_steps.map((step, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                  <CheckSquare size={16} style={{ color: '#6366f1', flexShrink: 0, marginTop: '2px' }} />
-                  <span style={{ color: 'var(--text-secondary)' }}>{step}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {aiResult.review_schedule && (
-            <div>
-              <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Review Schedule</div>
-              <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{aiResult.review_schedule}</p>
-            </div>
-          )}
-        </div>
-      )}
 
       <div className="search-bar">
         <Search size={16} />

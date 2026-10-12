@@ -7,6 +7,59 @@ const authMiddleware = require('../middleware/auth');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const demoEnabled = () => process.env.NODE_ENV === 'development' && process.env.ENABLE_DEMO_CREDENTIAL_AUTOFILL === 'true';
+const demoCredentials = () => [
+  ['DEMO_EMAIL', 'DEMO_PASSWORD'],
+  ['SEED_ADMIN_EMAIL', 'SEED_ADMIN_PASSWORD'],
+  ['ADMIN_EMAIL', 'ADMIN_PASSWORD'],
+  ['DEFAULT_EMAIL', 'DEFAULT_PASSWORD'],
+].map(([email, password]) => [process.env[email], process.env[password]]).find(([email, password]) => email && password);
+
+router.get('/demo-availability', async (req, res) => {
+  const credentials = demoEnabled() && demoCredentials();
+  if (!credentials) return res.json({ available: false });
+  try {
+    const [email, password] = credentials;
+    const { rows } = await pool.query('SELECT password_hash FROM users WHERE email = $1', [email]);
+    res.json({ available: Boolean(rows[0] && await bcrypt.compare(password, rows[0].password_hash)) });
+  } catch (_) {
+    res.json({ available: false });
+  }
+});
+
+// Fill-only demo credentials for the login form. Development opt-in only; values
+// come from server-side configuration and are never hardcoded in the client.
+router.get('/demo-credentials', (req, res) => {
+  const credentials = demoEnabled() && demoCredentials();
+  if (!credentials) {
+    return res.status(404).json({ error: 'Demo credentials are not configured for this local environment.' });
+  }
+  const [email, password] = credentials;
+  res.json({ email, password });
+});
+
+router.post('/demo-login', async (req, res) => {
+  const credentials = demoEnabled() && demoCredentials();
+  if (!credentials) return res.status(404).json({ error: 'Demo login is not configured for this local environment.' });
+  try {
+    const [email, password] = credentials;
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      return res.status(503).json({ error: 'The configured demo account is unavailable.' });
+    }
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role, full_name: user.full_name },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    res.json({ token, user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role, department: user.department } });
+  } catch (err) {
+    console.error('Demo login error:', err);
+    res.status(500).json({ error: 'Demo login is unavailable.' });
+  }
+});
+
 // POST /login
 router.post('/login', async (req, res) => {
   try {

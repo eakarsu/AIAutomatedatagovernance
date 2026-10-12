@@ -68,6 +68,23 @@ const DEFAULT_RULES = [
   },
 ];
 
+// Additional same-domain sample policies for the in-memory registry view.
+[
+  ['Baggage Tracking Retention', 'Operations', 'Medium', 'expire', 'baggage.tracking.*'],
+  ['Ticket Price Change Audit', 'Finance', 'High', 'audit', 'ticket.pricing.*'],
+  ['Passenger Manifest Access', 'Reservations', 'High', 'restrict', 'passenger.manifest.*'],
+  ['Flight Telemetry Quality', 'Operations', 'Medium', 'validate', 'flight.telemetry.*'],
+  ['Customer Feedback Masking', 'Customer', 'Medium', 'mask', 'feedback.contact.*'],
+  ['Crew Duty Log Retention', 'Operations', 'High', 'expire', 'crew.duty_log.*'],
+  ['Loyalty Points Change Audit', 'Loyalty', 'Medium', 'audit', 'loyalty.points.*'],
+  ['Fuel Reporting Validation', 'Finance', 'Medium', 'validate', 'flight.fuel_burn.*'],
+  ['Gate Assignment Access', 'Operations', 'Low', 'restrict', 'airport.gate_assignment.*'],
+  ['Maintenance Work Order Review', 'Maintenance', 'High', 'audit', 'maintenance.work_order.*'],
+].forEach(([name, domain, severity, action, target], index) => DEFAULT_RULES.push({
+  id: `PR-${String(index + 6).padStart(3, '0')}`, name, domain, severity, action, target,
+  enabled: true, updated_at: new Date().toISOString(),
+}));
+
 let RULES = JSON.parse(JSON.stringify(DEFAULT_RULES));
 
 // ─── Synthesizers ───────────────────────────────────────────────────────────

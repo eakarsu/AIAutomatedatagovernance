@@ -1,9 +1,15 @@
+
+import FullAIExamples, { useFullAIExamples } from "./FullAIExamples.jsx";
+import AIHistory from './AIHistory';
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState } from 'react';
 import { Sparkles, Brain, Shield, GitBranch, CheckSquare, FileText, Loader, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { aiAPI } from '../services/api';
 
 const AIInsights = () => {
+  const fullAIExamples = useFullAIExamples();
+
   const [activeTab, setActiveTab] = useState('classifier');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -52,7 +58,7 @@ const AIInsights = () => {
     try {
       const res = await aiAPI.classify(classifierForm);
       setResult(res.data);
-      toast.success('Classification complete');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'Classification complete');
     } catch (err) {
       toast.error('Classification failed');
     } finally {
@@ -70,7 +76,7 @@ const AIInsights = () => {
     try {
       const res = await aiAPI.detectAnomalies(anomalyForm);
       setResult(res.data);
-      toast.success('Anomaly detection complete');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'Anomaly detection complete');
     } catch (err) {
       toast.error('Anomaly detection failed');
     } finally {
@@ -88,7 +94,7 @@ const AIInsights = () => {
     try {
       const res = await aiAPI.generatePolicy(policyForm);
       setResult(res.data);
-      toast.success('Policy generated successfully');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'Policy generated successfully');
     } catch (err) {
       toast.error('Policy generation failed');
     } finally {
@@ -106,7 +112,7 @@ const AIInsights = () => {
     try {
       const res = await aiAPI.impactAnalysis(impactForm);
       setResult(res.data);
-      toast.success('Impact analysis complete');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'Impact analysis complete');
     } catch (err) {
       toast.error('Impact analysis failed');
     } finally {
@@ -124,7 +130,7 @@ const AIInsights = () => {
     try {
       const res = await aiAPI.suggestQualityRules(qualityForm);
       setResult(res.data);
-      toast.success('Quality rules suggested');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'Quality rules suggested');
     } catch (err) {
       toast.error('Quality rule suggestion failed');
     } finally {
@@ -142,7 +148,7 @@ const AIInsights = () => {
     try {
       const res = await aiAPI.generateDescription(descForm);
       setResult(res.data);
-      toast.success('Description generated');
+      toast[res.data?.status === 'unavailable' ? 'info' : 'success'](res.data?.status === 'unavailable' ? res.data.message : 'Description generated');
     } catch (err) {
       toast.error('Description generation failed');
     } finally {
@@ -179,19 +185,19 @@ const AIInsights = () => {
     <div>
       <div className="form-group">
         <label className="form-label">Table Name *</label>
-        <input className="form-input" value={classifierForm.table_name} onChange={e => setClassifierForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. passenger_records" />
+        <input className="form-input" value={classifierForm.table_name} onChange={e => setClassifierForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. passenger_records" data-full-ai-field={fullAIExamples.bind({ current: classifierForm.table_name, change: e => setClassifierForm(p => ({ ...p, table_name: e.target.value })), label: "classifierForm.table_name", manual: false, json: false, sample: '' }, "p1-5914", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Column Name *</label>
-        <input className="form-input" value={classifierForm.column_name} onChange={e => setClassifierForm(p => ({ ...p, column_name: e.target.value }))} placeholder="e.g. email_address" />
+        <input className="form-input" value={classifierForm.column_name} onChange={e => setClassifierForm(p => ({ ...p, column_name: e.target.value }))} placeholder="e.g. email_address" data-full-ai-field={fullAIExamples.bind({ current: classifierForm.column_name, change: e => setClassifierForm(p => ({ ...p, column_name: e.target.value })), label: "classifierForm.column_name", manual: false, json: false, sample: '' }, "p1-6213", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Sample Data</label>
-        <textarea className="form-textarea" value={classifierForm.sample_data} onChange={e => setClassifierForm(p => ({ ...p, sample_data: e.target.value }))} rows={3} placeholder="Paste sample data values..." />
+        <textarea className="form-textarea" value={classifierForm.sample_data} onChange={e => setClassifierForm(p => ({ ...p, sample_data: e.target.value }))} rows={3} placeholder="Paste sample data values..." data-full-ai-field={fullAIExamples.bind({ current: classifierForm.sample_data, change: e => setClassifierForm(p => ({ ...p, sample_data: e.target.value })), label: "classifierForm.sample_data", manual: false, json: false, sample: '' }, "p1-6508", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Data Type</label>
-        <select className="form-select" value={classifierForm.data_type} onChange={e => setClassifierForm(p => ({ ...p, data_type: e.target.value }))}>
+        <select className="form-select" value={classifierForm.data_type} onChange={e => setClassifierForm(p => ({ ...p, data_type: e.target.value }))} data-full-ai-field={fullAIExamples.bind({ current: classifierForm.data_type, change: e => setClassifierForm(p => ({ ...p, data_type: e.target.value })), label: "classifierForm.data_type", manual: false, json: false, sample: 'string' }, "p1-6825", undefined)}>
           <option value="string">String</option>
           <option value="integer">Integer</option>
           <option value="date">Date</option>
@@ -287,19 +293,19 @@ const AIInsights = () => {
     <div>
       <div className="form-group">
         <label className="form-label">Table Name *</label>
-        <input className="form-input" value={anomalyForm.table_name} onChange={e => setAnomalyForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. flight_bookings" />
+        <input className="form-input" value={anomalyForm.table_name} onChange={e => setAnomalyForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. flight_bookings" data-full-ai-field={fullAIExamples.bind({ current: anomalyForm.table_name, change: e => setAnomalyForm(p => ({ ...p, table_name: e.target.value })), label: "anomalyForm.table_name", manual: false, json: false, sample: '' }, "p1-11437", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Column Name *</label>
-        <input className="form-input" value={anomalyForm.column_name} onChange={e => setAnomalyForm(p => ({ ...p, column_name: e.target.value }))} placeholder="e.g. ticket_price" />
+        <input className="form-input" value={anomalyForm.column_name} onChange={e => setAnomalyForm(p => ({ ...p, column_name: e.target.value }))} placeholder="e.g. ticket_price" data-full-ai-field={fullAIExamples.bind({ current: anomalyForm.column_name, change: e => setAnomalyForm(p => ({ ...p, column_name: e.target.value })), label: "anomalyForm.column_name", manual: false, json: false, sample: '' }, "p1-11728", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Statistics</label>
-        <textarea className="form-textarea" value={anomalyForm.statistics} onChange={e => setAnomalyForm(p => ({ ...p, statistics: e.target.value }))} rows={3} placeholder="Describe statistics: mean, median, std dev, min, max..." />
+        <textarea className="form-textarea" value={anomalyForm.statistics} onChange={e => setAnomalyForm(p => ({ ...p, statistics: e.target.value }))} rows={3} placeholder="Describe statistics: mean, median, std dev, min, max..." data-full-ai-field={fullAIExamples.bind({ current: anomalyForm.statistics, change: e => setAnomalyForm(p => ({ ...p, statistics: e.target.value })), label: "anomalyForm.statistics", manual: false, json: false, sample: '' }, "p1-12015", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Recent Values</label>
-        <textarea className="form-textarea" value={anomalyForm.recent_values} onChange={e => setAnomalyForm(p => ({ ...p, recent_values: e.target.value }))} rows={3} placeholder="Paste recent values or describe patterns..." />
+        <textarea className="form-textarea" value={anomalyForm.recent_values} onChange={e => setAnomalyForm(p => ({ ...p, recent_values: e.target.value }))} rows={3} placeholder="Paste recent values or describe patterns..." data-full-ai-field={fullAIExamples.bind({ current: anomalyForm.recent_values, change: e => setAnomalyForm(p => ({ ...p, recent_values: e.target.value })), label: "anomalyForm.recent_values", manual: false, json: false, sample: '' }, "p1-12356", undefined)} />
       </div>
       <button className="btn btn-primary" onClick={handleDetectAnomalies} disabled={loading} style={{ marginTop: '1rem' }}>
         <AlertTriangle size={16} /> Detect Anomalies
@@ -376,7 +382,7 @@ const AIInsights = () => {
     <div>
       <div className="form-group">
         <label className="form-label">Policy Type *</label>
-        <select className="form-select" value={policyForm.policy_type} onChange={e => setPolicyForm(p => ({ ...p, policy_type: e.target.value }))}>
+        <select className="form-select" value={policyForm.policy_type} onChange={e => setPolicyForm(p => ({ ...p, policy_type: e.target.value }))} data-full-ai-field={fullAIExamples.bind({ current: policyForm.policy_type, change: e => setPolicyForm(p => ({ ...p, policy_type: e.target.value })), label: "policyForm.policy_type", manual: false, json: false, sample: 'retention' }, "p1-16098", undefined)}>
           <option value="retention">Retention</option>
           <option value="privacy">Privacy</option>
           <option value="access">Access</option>
@@ -386,15 +392,15 @@ const AIInsights = () => {
       </div>
       <div className="form-group">
         <label className="form-label">Scope *</label>
-        <input className="form-input" value={policyForm.scope} onChange={e => setPolicyForm(p => ({ ...p, scope: e.target.value }))} placeholder="e.g. All passenger personal data" />
+        <input className="form-input" value={policyForm.scope} onChange={e => setPolicyForm(p => ({ ...p, scope: e.target.value }))} placeholder="e.g. All passenger personal data" data-full-ai-field={fullAIExamples.bind({ current: policyForm.scope, change: e => setPolicyForm(p => ({ ...p, scope: e.target.value })), label: "policyForm.scope", manual: false, json: false, sample: '' }, "p1-16625", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Industry Context</label>
-        <input className="form-input" value={policyForm.industry_context} onChange={e => setPolicyForm(p => ({ ...p, industry_context: e.target.value }))} />
+        <input className="form-input" value={policyForm.industry_context} onChange={e => setPolicyForm(p => ({ ...p, industry_context: e.target.value }))} data-full-ai-field={fullAIExamples.bind({ current: policyForm.industry_context, change: e => setPolicyForm(p => ({ ...p, industry_context: e.target.value })), label: "policyForm.industry_context", manual: false, json: false, sample: 'airline industry' }, "p1-16919", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Compliance Requirements</label>
-        <textarea className="form-textarea" value={policyForm.compliance_requirements} onChange={e => setPolicyForm(p => ({ ...p, compliance_requirements: e.target.value }))} rows={3} placeholder="e.g. GDPR, CCPA, IATA Resolution 830d..." />
+        <textarea className="form-textarea" value={policyForm.compliance_requirements} onChange={e => setPolicyForm(p => ({ ...p, compliance_requirements: e.target.value }))} rows={3} placeholder="e.g. GDPR, CCPA, IATA Resolution 830d..." data-full-ai-field={fullAIExamples.bind({ current: policyForm.compliance_requirements, change: e => setPolicyForm(p => ({ ...p, compliance_requirements: e.target.value })), label: "policyForm.compliance_requirements", manual: false, json: false, sample: '' }, "p1-17195", undefined)} />
       </div>
       <button className="btn btn-primary" onClick={handleGeneratePolicy} disabled={loading} style={{ marginTop: '1rem' }}>
         <Shield size={16} /> Generate Policy
@@ -460,7 +466,7 @@ const AIInsights = () => {
     <div>
       <div className="form-group">
         <label className="form-label">Change Type *</label>
-        <select className="form-select" value={impactForm.change_type} onChange={e => setImpactForm(p => ({ ...p, change_type: e.target.value }))}>
+        <select className="form-select" value={impactForm.change_type} onChange={e => setImpactForm(p => ({ ...p, change_type: e.target.value }))} data-full-ai-field={fullAIExamples.bind({ current: impactForm.change_type, change: e => setImpactForm(p => ({ ...p, change_type: e.target.value })), label: "impactForm.change_type", manual: false, json: false, sample: 'schema_change' }, "p1-20586", undefined)}>
           <option value="schema_change">Schema Change</option>
           <option value="data_migration">Data Migration</option>
           <option value="column_removal">Column Removal</option>
@@ -470,15 +476,15 @@ const AIInsights = () => {
       </div>
       <div className="form-group">
         <label className="form-label">Target Table *</label>
-        <input className="form-input" value={impactForm.target_table} onChange={e => setImpactForm(p => ({ ...p, target_table: e.target.value }))} placeholder="e.g. passenger_records" />
+        <input className="form-input" value={impactForm.target_table} onChange={e => setImpactForm(p => ({ ...p, target_table: e.target.value }))} placeholder="e.g. passenger_records" data-full-ai-field={fullAIExamples.bind({ current: impactForm.target_table, change: e => setImpactForm(p => ({ ...p, target_table: e.target.value })), label: "impactForm.target_table", manual: false, json: false, sample: '' }, "p1-21190", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Target Column</label>
-        <input className="form-input" value={impactForm.target_column} onChange={e => setImpactForm(p => ({ ...p, target_column: e.target.value }))} placeholder="e.g. passport_number" />
+        <input className="form-input" value={impactForm.target_column} onChange={e => setImpactForm(p => ({ ...p, target_column: e.target.value }))} placeholder="e.g. passport_number" data-full-ai-field={fullAIExamples.bind({ current: impactForm.target_column, change: e => setImpactForm(p => ({ ...p, target_column: e.target.value })), label: "impactForm.target_column", manual: false, json: false, sample: '' }, "p1-21485", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Proposed Change *</label>
-        <textarea className="form-textarea" value={impactForm.proposed_change} onChange={e => setImpactForm(p => ({ ...p, proposed_change: e.target.value }))} rows={3} placeholder="Describe the proposed change in detail..." />
+        <textarea className="form-textarea" value={impactForm.proposed_change} onChange={e => setImpactForm(p => ({ ...p, proposed_change: e.target.value }))} rows={3} placeholder="Describe the proposed change in detail..." data-full-ai-field={fullAIExamples.bind({ current: impactForm.proposed_change, change: e => setImpactForm(p => ({ ...p, proposed_change: e.target.value })), label: "impactForm.proposed_change", manual: false, json: false, sample: '' }, "p1-21784", undefined)} />
       </div>
       <button className="btn btn-primary" onClick={handleImpactAnalysis} disabled={loading} style={{ marginTop: '1rem' }}>
         <GitBranch size={16} /> Analyze Impact
@@ -568,15 +574,15 @@ const AIInsights = () => {
     <div>
       <div className="form-group">
         <label className="form-label">Table Name *</label>
-        <input className="form-input" value={qualityForm.table_name} onChange={e => setQualityForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. flight_schedules" />
+        <input className="form-input" value={qualityForm.table_name} onChange={e => setQualityForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. flight_schedules" data-full-ai-field={fullAIExamples.bind({ current: qualityForm.table_name, change: e => setQualityForm(p => ({ ...p, table_name: e.target.value })), label: "qualityForm.table_name", manual: false, json: false, sample: '' }, "p1-26362", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Columns *</label>
-        <textarea className="form-textarea" value={qualityForm.columns} onChange={e => setQualityForm(p => ({ ...p, columns: e.target.value }))} rows={3} placeholder="List columns: flight_number, departure_time, arrival_time, status..." />
+        <textarea className="form-textarea" value={qualityForm.columns} onChange={e => setQualityForm(p => ({ ...p, columns: e.target.value }))} rows={3} placeholder="List columns: flight_number, departure_time, arrival_time, status..." data-full-ai-field={fullAIExamples.bind({ current: qualityForm.columns, change: e => setQualityForm(p => ({ ...p, columns: e.target.value })), label: "qualityForm.columns", manual: false, json: false, sample: '' }, "p1-26650", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Sample Data</label>
-        <textarea className="form-textarea" value={qualityForm.sample_data} onChange={e => setQualityForm(p => ({ ...p, sample_data: e.target.value }))} rows={3} placeholder="Paste sample data..." />
+        <textarea className="form-textarea" value={qualityForm.sample_data} onChange={e => setQualityForm(p => ({ ...p, sample_data: e.target.value }))} rows={3} placeholder="Paste sample data..." data-full-ai-field={fullAIExamples.bind({ current: qualityForm.sample_data, change: e => setQualityForm(p => ({ ...p, sample_data: e.target.value })), label: "qualityForm.sample_data", manual: false, json: false, sample: '' }, "p1-26996", undefined)} />
       </div>
       <button className="btn btn-primary" onClick={handleSuggestQuality} disabled={loading} style={{ marginTop: '1rem' }}>
         <CheckSquare size={16} /> Suggest Rules
@@ -641,19 +647,19 @@ const AIInsights = () => {
     <div>
       <div className="form-group">
         <label className="form-label">Table Name *</label>
-        <input className="form-input" value={descForm.table_name} onChange={e => setDescForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. loyalty_members" />
+        <input className="form-input" value={descForm.table_name} onChange={e => setDescForm(p => ({ ...p, table_name: e.target.value }))} placeholder="e.g. loyalty_members" data-full-ai-field={fullAIExamples.bind({ current: descForm.table_name, change: e => setDescForm(p => ({ ...p, table_name: e.target.value })), label: "descForm.table_name", manual: false, json: false, sample: '' }, "p1-30184", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Column Name *</label>
-        <input className="form-input" value={descForm.column_name} onChange={e => setDescForm(p => ({ ...p, column_name: e.target.value }))} placeholder="e.g. tier_status" />
+        <input className="form-input" value={descForm.column_name} onChange={e => setDescForm(p => ({ ...p, column_name: e.target.value }))} placeholder="e.g. tier_status" data-full-ai-field={fullAIExamples.bind({ current: descForm.column_name, change: e => setDescForm(p => ({ ...p, column_name: e.target.value })), label: "descForm.column_name", manual: false, json: false, sample: '' }, "p1-30469", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Data Type</label>
-        <input className="form-input" value={descForm.data_type} onChange={e => setDescForm(p => ({ ...p, data_type: e.target.value }))} placeholder="e.g. varchar, integer, date" />
+        <input className="form-input" value={descForm.data_type} onChange={e => setDescForm(p => ({ ...p, data_type: e.target.value }))} placeholder="e.g. varchar, integer, date" data-full-ai-field={fullAIExamples.bind({ current: descForm.data_type, change: e => setDescForm(p => ({ ...p, data_type: e.target.value })), label: "descForm.data_type", manual: false, json: false, sample: '' }, "p1-30748", undefined)} />
       </div>
       <div className="form-group">
         <label className="form-label">Sample Values</label>
-        <textarea className="form-textarea" value={descForm.sample_values} onChange={e => setDescForm(p => ({ ...p, sample_values: e.target.value }))} rows={3} placeholder="Paste sample values..." />
+        <textarea className="form-textarea" value={descForm.sample_values} onChange={e => setDescForm(p => ({ ...p, sample_values: e.target.value }))} rows={3} placeholder="Paste sample values..." data-full-ai-field={fullAIExamples.bind({ current: descForm.sample_values, change: e => setDescForm(p => ({ ...p, sample_values: e.target.value })), label: "descForm.sample_values", manual: false, json: false, sample: '' }, "p1-31038", undefined)} />
       </div>
       <button className="btn btn-primary" onClick={handleGenerateDesc} disabled={loading} style={{ marginTop: '1rem' }}>
         <FileText size={16} /> Generate
@@ -718,7 +724,7 @@ const AIInsights = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container" data-full-ai-workspace="AIInsights"><FullAIExamples controller={fullAIExamples} disabled={Boolean(loading)} />
       <div className="page-header">
         <div>
           <h1 className="page-title"><Sparkles size={24} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px' }} />AI Insights</h1>
@@ -774,7 +780,7 @@ const AIInsights = () => {
               <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
             </div>
           ) : result ? (
-            resultRenderers[activeTab]?.()
+            <FormattedAIReport title={`${tabs.find(tab => tab.key === activeTab)?.label || 'AI'} report`} response={result} />
           ) : (
             <div style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -788,6 +794,7 @@ const AIInsights = () => {
           )}
         </div>
       </div>
+      <AIHistory />
     </div>
   );
 };

@@ -36,9 +36,23 @@ api.interceptors.response.use(
   }
 );
 
+// List routes may return a plain array or a paginated { data, pagination }.
+// Keep the Axios response contract while ensuring every record consumer sees an array.
+export const recordRows = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (payload && Array.isArray(payload.data)) return payload.data;
+  return [];
+};
+
+const listResponse = (request) => request.then((response) => ({
+  ...response,
+  data: recordRows(response.data),
+  pagination: response.data?.pagination,
+}));
+
 // Generic CRUD service factory
 const createCrudService = (basePath) => ({
-  getAll: (params) => api.get(basePath, { params }),
+  getAll: (params) => listResponse(api.get(basePath, { params })),
   getById: (id) => api.get(`${basePath}/${id}`),
   create: (data) => api.post(basePath, data),
   update: (id, data) => api.put(`${basePath}/${id}`, data),
@@ -48,6 +62,9 @@ const createCrudService = (basePath) => ({
 // Auth API
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
+  demoAvailability: () => api.get('/auth/demo-availability'),
+  demoCredentials: () => api.get('/auth/demo-credentials'),
+  demoLogin: () => api.post('/auth/demo-login'),
   register: (userData) => api.post('/auth/register', userData),
   getMe: () => api.get('/auth/me'),
 };
@@ -84,7 +101,7 @@ export const glossaryAPI = createCrudService('/data-glossary');
 
 // Audit API (read-only + create for logging)
 export const auditAPI = {
-  getAll: (params) => api.get('/audit-logs', { params }),
+  getAll: (params) => listResponse(api.get('/audit-logs', { params })),
   getById: (id) => api.get(`/audit-logs/${id}`),
 };
 

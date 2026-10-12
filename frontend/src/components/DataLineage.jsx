@@ -1,3 +1,4 @@
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Edit2, Trash2, ArrowRight, GitBranch, Server, AlertCircle, Activity, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -207,49 +208,8 @@ const DataLineage = () => {
                 </button>
               </div>
 
-              {aiResult && (
-                <div style={{ marginTop: '1rem', padding: '1.25rem', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08))', border: '2px solid transparent', boxShadow: '0 0 0 2px rgba(99,102,241,0.3)' }}>
-                  <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Sparkles size={18} /> Impact Analysis Result</h3>
+              {aiResult && <FormattedAIReport title="Impact analysis" response={aiResult} />}
 
-                  {aiResult.risk_level && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>Risk Level:</span>
-                      <span className={`status-badge ${riskColor(aiResult.risk_level)}`}>{aiResult.risk_level}</span>
-                    </div>
-                  )}
-
-                  {aiResult.affected_systems && aiResult.affected_systems.length > 0 && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Affected Systems</div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.5rem' }}>
-                        {aiResult.affected_systems.map((sys, i) => (
-                          <div key={i} style={{ padding: '0.75rem', background: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-primary)' }}>
-                            <Server size={14} style={{ marginRight: '0.5rem', color: '#6366f1' }} />
-                            <strong>{typeof sys === 'string' ? sys : sys.name || sys.system}</strong>
-                            {sys.impact && <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>{sys.impact}</div>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {aiResult.recommendations && aiResult.recommendations.length > 0 && (
-                    <div>
-                      <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Recommendations</div>
-                      <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                        {aiResult.recommendations.map((rec, i) => <li key={i} style={{ marginBottom: '0.25rem', color: 'var(--text-secondary)' }}>{rec}</li>)}
-                      </ul>
-                    </div>
-                  )}
-
-                  {aiResult.summary && (
-                    <div style={{ marginTop: '0.75rem' }}>
-                      <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Summary</div>
-                      <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{aiResult.summary}</p>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>

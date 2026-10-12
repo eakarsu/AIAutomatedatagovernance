@@ -116,7 +116,7 @@ Sample Data: ${JSON.stringify(sample_data || 'not provided')}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -150,7 +150,7 @@ Recent Values: ${JSON.stringify(recent_values || 'not provided')}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -185,7 +185,7 @@ Compliance: ${JSON.stringify(compliance_requirements || ['GDPR', 'SOX'])}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -221,7 +221,7 @@ Proposed: ${JSON.stringify(proposed_change || 'not specified')}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -250,7 +250,7 @@ Sample: ${JSON.stringify(sample_data || 'not provided')}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -282,7 +282,7 @@ Samples: ${JSON.stringify(sample_values || 'not provided')}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -377,7 +377,7 @@ Jurisdictions: ${JSON.stringify(jurisdictions || ['US','EU'])}` }
     ];
 
     const r = await callOpenRouter(messages, { maxTokens: 3000 });
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -551,7 +551,7 @@ router.post('/suggest-glossary', authMiddleware, aiRateLimiter, async (req, res)
     ];
 
     const r = await callOpenRouter(messages, { maxTokens: 2500 });
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -602,7 +602,7 @@ Aggregate metrics from system: ${JSON.stringify(summary)}` }
     ];
 
     const r = await callOpenRouter(messages, { maxTokens: 3000 });
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -634,12 +634,11 @@ router.post('/balance-stewards', authMiddleware, async (req, res) => {
         workload: parseInt(s.workload) || 0,
       }));
     } catch (_) {
-      // Fallback fake list if table not available
-      stewards = [{ id: 1, name: 'Default Steward', domain: 'general', workload: 0 }];
+      return res.json({ status: 'unavailable', message: 'Real steward records could not be loaded. No assignments were made.' });
     }
 
     if (stewards.length === 0) {
-      return res.status(409).json({ error: 'No stewards available for assignment.' });
+      return res.json({ status: 'unavailable', message: 'No real stewards are available for assignment. No assignments were made.' });
     }
 
     const assignments = unassigned_assets.map(asset => {
@@ -694,7 +693,7 @@ Business Context: ${business_context || 'not provided'}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 
@@ -730,7 +729,7 @@ Records: ${JSON.stringify(records)}` }
     ];
 
     const r = await callOpenRouter(messages);
-    if (!r.success) return res.status(502).json({ error: r.error });
+    if (!r.success) return res.json({ status: 'unavailable', message: 'The AI provider is unavailable. No report was generated or saved.' });
     const parsed = parseAIJson(r.content);
     const data = parsed.ok ? parsed.data : { raw_response: r.content };
 

@@ -1,3 +1,4 @@
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Edit2, Trash2, BookOpen, Tag, CheckCircle, Clock, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -265,40 +266,8 @@ const DataGlossary = () => {
                   <Sparkles size={16} /> {aiLoading ? 'Generating...' : 'AI Generate Description'}
                 </button>
                 {aiLoading && <div className="loading-spinner" style={{ marginTop: '1rem' }}>Generating AI description...</div>}
-                {aiResult && (
-                  <div className="ai-output" style={{ marginTop: '1rem' }}>
-                    <div className="ai-output-card">
-                      <div className="ai-output-header">AI Generated Description</div>
-                      <div className="ai-output-body">
-                        {aiResult.description && (
-                          <div className="ai-output-section">
-                            <div className="ai-section-title">Description</div>
-                            <p>{aiResult.description}</p>
-                          </div>
-                        )}
-                        {aiResult.business_definition && (
-                          <div className="ai-output-section">
-                            <div className="ai-section-title">Business Definition</div>
-                            <p>{aiResult.business_definition}</p>
-                          </div>
-                        )}
-                        {aiResult.suggested_tags && (
-                          <div className="ai-output-section">
-                            <div className="ai-section-title">Suggested Tags</div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                              {(Array.isArray(aiResult.suggested_tags) ? aiResult.suggested_tags : []).map((tag, i) => (
-                                <span key={i} style={{
-                                  background: '#dbeafe', color: '#1e40af', padding: '2px 10px',
-                                  borderRadius: '12px', fontSize: '0.75rem', fontWeight: 500
-                                }}>{tag}</span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {aiResult && <FormattedAIReport title="Generated glossary description" response={aiResult} />}
+
               </div>
             </div>
           </div>

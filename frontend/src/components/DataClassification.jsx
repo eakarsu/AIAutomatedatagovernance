@@ -1,3 +1,4 @@
+import FormattedAIReport from './FormattedAIReport';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Edit2, Trash2, Shield, ShieldAlert, ShieldCheck, Eye, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -192,47 +193,8 @@ const DataClassification = () => {
                 </button>
               </div>
 
-              {aiResult && (
-                <div style={{ marginTop: '1rem', padding: '1.25rem', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08))', border: '2px solid transparent', backgroundClip: 'padding-box', boxShadow: '0 0 0 2px rgba(99,102,241,0.3)' }}>
-                  <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Sparkles size={18} /> AI Classification Result</h3>
+              {aiResult && <FormattedAIReport title="Classification report" response={aiResult} />}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
-                    <div style={{ padding: '0.75rem', background: 'var(--bg-tertiary)', borderRadius: '8px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Classification</div>
-                      <span className={`status-badge ${classificationColor(aiResult.classification_level)}`}>{aiResult.classification_level || 'N/A'}</span>
-                    </div>
-                    <div style={{ padding: '0.75rem', background: 'var(--bg-tertiary)', borderRadius: '8px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Confidence</div>
-                      <strong>{aiResult.confidence ? `${(aiResult.confidence * 100).toFixed(0)}%` : 'N/A'}</strong>
-                    </div>
-                    <div style={{ padding: '0.75rem', background: 'var(--bg-tertiary)', borderRadius: '8px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Flags</div>
-                      <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        {aiResult.pii_flag && <span className="status-badge critical">PII</span>}
-                        {aiResult.phi_flag && <span className="status-badge warning">PHI</span>}
-                        {aiResult.pci_flag && <span className="status-badge warning">PCI</span>}
-                        {!aiResult.pii_flag && !aiResult.phi_flag && !aiResult.pci_flag && <span style={{ color: 'var(--text-muted)' }}>None</span>}
-                      </div>
-                    </div>
-                  </div>
-
-                  {aiResult.reasoning && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Reasoning</div>
-                      <p style={{ margin: 0, lineHeight: 1.6, color: 'var(--text-secondary)' }}>{aiResult.reasoning}</p>
-                    </div>
-                  )}
-
-                  {aiResult.recommendations && aiResult.recommendations.length > 0 && (
-                    <div>
-                      <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Recommendations</div>
-                      <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                        {aiResult.recommendations.map((rec, i) => <li key={i} style={{ marginBottom: '0.25rem', color: 'var(--text-secondary)' }}>{rec}</li>)}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>

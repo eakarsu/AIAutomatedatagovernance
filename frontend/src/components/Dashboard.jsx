@@ -74,7 +74,7 @@ const Dashboard = ({ onNavigate }) => {
       setClassificationItems(classData);
 
       const sortedLogs = [...auditData].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      setRecentLogs(sortedLogs.slice(0, 10));
+      setRecentLogs(sortedLogs.slice(0, 15));
     } catch (err) {
       toast.error('Failed to load dashboard data');
     } finally {
