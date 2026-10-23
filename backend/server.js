@@ -53,6 +53,8 @@ app.use('/api/policies', require('./routes/policies'));
 app.use('/api/custom-views', require('./routes/customViews')); // Governance Views: lineage graph, classification heatmap, audit PDF, policy rules
 app.use('/api/data-contract-monitor', require('./routes/dataContractMonitor'));
 app.use('/api/governance-cases', require('./middleware/auth'), require('./routes/governanceCases'));
+app.use('/api/tasks', require('./routes/tasks26c').createTasksRouter({ pool: require('./db').pool }));
+app.use('/api/feature-ai', require('./routes/featureAi26c').createFeatureAiRouter({ loadRecords: async (req) => { const { pool } = require('./db'); const tenantFor = u => String(u.tenant_id || u.organization_id || `legacy-user:${u.id}`); const r = await pool.query('SELECT * FROM governance_cases WHERE tenant_id=$1 ORDER BY updated_at DESC LIMIT 100', [tenantFor(req.user)]); return r.rows; } }));
 
 // Health check
 app.get('/api/health', (req, res) => {

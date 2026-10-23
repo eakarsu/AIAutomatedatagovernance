@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import FeaturePackPanel from './components/FeaturePackPanel';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -491,6 +492,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/feature-pack" element={<FeaturePackPanel />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <ToastContainer

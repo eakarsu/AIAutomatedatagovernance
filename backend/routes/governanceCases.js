@@ -1,9 +1,11 @@
 'use strict';
 const router = require('express').Router(); const { pool } = require('../db');
 const { validateCase, coverage, assertTransition } = require('../domain/governanceWorkflow');
+const { filterRecords, sendExport } = require('../lib/featurePack26c');
 const tenantFor = user => String(user.tenant_id || user.organization_id || `legacy-user:${user.id}`);
 router.get('/external-capabilities', (req, res) => res.json({ catalog: { configured: false }, warehouse: { configured: false }, iam: { configured: false }, ticketing: { configured: false }, consent: { configured: false }, deletionExport: { configured: false } }));
-router.get('/', async (req, res) => { try { const r = await pool.query('SELECT * FROM governance_cases WHERE tenant_id=$1 ORDER BY updated_at DESC', [tenantFor(req.user)]); res.json(r.rows); } catch { res.status(500).json({ error: 'Unable to load cases' }); } });
+router.get('/export', async (req, res) => { try { const r = await pool.query('SELECT * FROM governance_cases WHERE tenant_id=$1 ORDER BY updated_at DESC', [tenantFor(req.user)]); return sendExport(req, res, r.rows); } catch { return res.status(500).json({ error: 'Unable to export cases' }); } });
+router.get('/', async (req, res) => { try { const r = await pool.query('SELECT * FROM governance_cases WHERE tenant_id=$1 ORDER BY updated_at DESC', [tenantFor(req.user)]); res.json(filterRecords(r.rows, req.query)); } catch { res.status(500).json({ error: 'Unable to load cases' }); } });
 router.post('/', async (req, res) => {
   const key = req.get('Idempotency-Key'); if (!key) return res.status(400).json({ error: 'Idempotency-Key header is required' });
   const validation = validateCase(req.body || {}); if (!validation.valid) return res.status(422).json(validation);
